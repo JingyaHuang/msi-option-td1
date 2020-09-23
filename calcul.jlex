@@ -21,8 +21,29 @@ import java.io.*;
 [0-9]+(\.[0-9]*)?([Ee]-?[0-9]+)? { return new Symbol(sym.TK_VAL, new Double(yytext())); }
 "+"	{ return new Symbol(sym.TK_PLUS); }
 "-"	{ return new Symbol(sym.TK_MOINS); }
+"="	{ return new Symbol(sym.TK_EGALE); }
+"!="	{ return new Symbol(sym.TK_INEGALE); }
+"=="	{ return new Symbol(sym.TK_EGALEGAL); }
 "*"	{ return new Symbol(sym.TK_FOIS); }
 "/"	{ return new Symbol(sym.TK_DIVISE); }
+"("	{ return new Symbol(sym.TK_PARENTHESE_G); }
+")"	{ return new Symbol(sym.TK_PARENTHESE_D); }
+"sin"   { return new Symbol(sym.TK_SINUS); }
+"cos"   { return new Symbol(sym.TK_COSINUS); }
+"tan"	{ return new Symbol(sym.TK_TANGENTE); }
+"sqrt"	{ return new Symbol(sym.TK_SQUARE); }
+"log"	{ return new Symbol(sym.TK_LOG); }
+"**"	{ return new Symbol(sym.TK_PUISSANCE); }
+"true"	{ return new Symbol(sym.TK_TRUE); }
+"false"	{ return new Symbol(sym.TK_FALSE); }
+"pi"	{ return new Symbol(sym.TK_PI); }
+"&"	{ return new Symbol(sym.TK_ET); }
+"|"	{ return new Symbol(sym.TK_OU); }
+">="	{ return new Symbol(sym.TK_SUPERIEUR_EGAL); }
+"<="	{ return new Symbol(sym.TK_INFERIEUR_EGAL); }
+">"	{ return new Symbol(sym.TK_SUPERIEUR); }
+"<"	{ return new Symbol(sym.TK_INFERIEUR); }
+[a-zA-Z]	{return new Symbol(sym.TK_VAR, yytext()); }
 (\n|\r|\r\n)	{ return new Symbol(sym.TK_DONE); }
 [\ \t\f] { /* ignore espaces et assimiles. */ }
 .	{ System.err.println("unexpected char '" + yytext() +

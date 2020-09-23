@@ -10,17 +10,31 @@ parser code {:
   }
 :}
 
+action code {:
+  Map<String, Double> vars = new HashMap(); :}
+
 // definition des token
-terminal TK_PLUS, TK_DONE, TK_MOINS, TK_FOIS, TK_DIVISE;
-terminal Double TK_VAL; 
+terminal TK_PLUS, TK_DONE, TK_MOINS, TK_FOIS, TK_DIVISE, TK_PARENTHESE_G, TK_PARENTHESE_D;
+terminal  TK_SINUS, TK_COSINUS, TK_TANGENTE, TK_PUISSANCE, TK_SQUARE, TK_LOG, TK_PI, TK_EGALE, TK_INEGALE;
+terminal TK_TRUE, TK_FALSE, TK_ET, TK_OU, TK_EGALEGAL, TK_SUPERIEUR_EGAL, TK_INFERIEUR_EGAL, TK_SUPERIEUR, TK_INFERIEUR;
+terminal Double TK_VAL;
+terminal String TK_VAR; 
 
 // definition des etats intermediaires
 non terminal commandes, commande;
 non terminal Double expression;
+non terminal String ident;
 
 // associativite et priorite des operateurs
+precedence left TK_EGALE;
+precedence left TK_ET, TK_OU;
+precedence left TK_INEGALE, TK_EGALEGAL, TK_SUPERIEUR_EGAL, TK_INFERIEUR_EGAL, TK_SUPERIEUR, TK_INFERIEUR;
 precedence left TK_PLUS, TK_MOINS;
 precedence left TK_FOIS, TK_DIVISE;
+precedence left TK_PARENTHESE_G, TK_PARENTHESE_D;
+precedence left TK_SINUS, TK_COSINUS, TK_TANGENTE;
+precedence left TK_SQUARE, TK_LOG, TK_PUISSANCE;
+precedence left TK_PI, TK_TRUE, TK_FALSE;
 
 // objectif
 start with commandes;
@@ -34,6 +48,13 @@ commande ::=
     expression:e // expression seule, affichage
 	{: System.out.println("# " + e); :}
     TK_DONE
+  | ident:v // afficher tous variables
+	{: System.out.println("#" + vars.get(v)); :}
+    TK_DONE
+;   
+
+ident ::= TK_VAR:v TK_EGALE expression:e
+	{: vars.put(v,e); RESULT = v; :}
 ;
 
 expression ::=
@@ -41,10 +62,46 @@ expression ::=
 	{: RESULT = e1 + e2 ; :}
   | TK_VAL:v // valeur
 	{: RESULT = v; :}
+  | TK_PI // pi
+	{: RESULT = Math.PI; :}
   | expression:e1 TK_MOINS expression:e2 // effectue la substraction
 	{: RESULT = e1 - e2 ; :}
   | expression:e1 TK_FOIS expression:e2 // effectue la multiplication
 	{: RESULT = e1 * e2 ; :}
   | expression:e1 TK_DIVISE expression:e2 // effectue la division
-	{: RESULT = e1 / e2 ; :}	
+	{: RESULT = e1 / e2 ; :}
+  | TK_MOINS expression:e // moins unaire
+	{: RESULT = 0 - e ; :}
+  | TK_PARENTHESE_G expression:e TK_PARENTHESE_D // entre parentheses
+	{: RESULT = e ; :}
+  | TK_SINUS expression:e // sinus
+	{: RESULT = Math.sin(e) ; :}
+  | TK_COSINUS expression:e // cosinus
+	{: RESULT = Math.cos(e) ; :}
+  | TK_TANGENTE expression:e // tangente
+	{: RESULT = Math.tan(e) ; :}
+  | TK_SQUARE expression:e // racine
+	{: RESULT = Math.sqrt(e) ; :}
+  | TK_LOG TK_PARENTHESE_G expression:e TK_PARENTHESE_D// log
+	{: RESULT = Math.log(e) ; :}
+  | expression:e1 TK_PUISSANCE expression:e2 // puissance
+	{: RESULT = Math.pow(e1, e2) ; :}
+  | TK_VAR:v
+        {: RESULT = vars.get(v) ; :}
+  | TK_TRUE
+	{: RESULT = 1.0 ; :}
+  | TK_FALSE
+	{: RESULT = 0.0 ; :}
+  | expression:e1 TK_ET expression:e2
+	{: RESULT = e1 * e2 ; :}
+  | expression:e1 TK_OU expression:e2
+	{: if ((e1 + e2) > 0.0) {RESULT = 1.0 ;} else {RESULT = 0.0 ;} :}
+  | expression:e1 TK_INEGALE expression:e2
+	{: if ( Math.abs(e1-e2)> 0) {RESULT = 1.0 ;} else {RESULT = 0.0 ;} :} 
+  | expression:e1 TK_EGALEGAL expression:e2
+	{: if (Math.abs(e1-e2)<=0) {RESULT = 1.0 ;} else {RESULT = 0.0 ;} :} 
+  | expression:e1 TK_SUPERIEUR_EGAL expression:e2
+	{: if (e1 > e2 || Math.abs(e1-e2)<=0){RESULT = 1.0 ;} else {RESULT = 0.0 ;} :}
+  | expression:e1 TK_SUPERIEUR expression:e2
+	{: if (e1 > e2) {RESULT = 1.0 ; } else {RESULT = 0.0 ;} :}
 ;
